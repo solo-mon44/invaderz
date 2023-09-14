@@ -35,6 +35,19 @@ div.appendChild(leftBtn)
 div.appendChild(fireBtn)
 div.appendChild(rightBtn)
 
+const startGame = (playerName) => {
+  // Display player name at the top of the game canvas
+  c.fillStyle = 'white'
+  c.font = '16px Arial'
+  c.fillText(`Player: ${playerName}`, 10, 20)
+
+  addEvents()
+  init() 
+}
+const playerModal = new Modal(startGame)
+playerModal.open()
+
+
 function init() {
   lives = 0
   generation = 1
@@ -150,7 +163,7 @@ function addEvents() {
         player.isMovingRight = false
         break
     }
-  });
+  })
 
   window.addEventListener('focus', function () {
     lastUpdate = Date.now()
@@ -244,5 +257,4 @@ function addEvents() {
   })
 }
 
-addEvents()
-init() 
+

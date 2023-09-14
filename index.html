@@ -14,9 +14,22 @@
 	<link rel="icon" type="image/png" href="favicon.png" />
 </head>
 <body>
+  <div id="playerModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <form id="playerForm">
+        <input type="text" id="playerName" name="playerName" placeholder="username" maxlength="8" required>
+        <br>
+        <input type="email" id="playerEmail" name="playerEmail" placeholder="email" required>
+        <br>
+        <input type="submit" value="START">
+      </form>
+    </div>
+  </div>
 	<script src="js/Invader.js"></script>
 	<script src="js/Player.js"></script>
 	<script src="js/Genetics.js"></script>
+  <script src="js/modal.js"></script>
 	<script src="js/main.js"></script>
 </body>
 </html>
