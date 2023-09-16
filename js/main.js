@@ -11,7 +11,8 @@ let canvas,
   rightBtn,
   fireBtn,
   div,
-  generation
+  generation, 
+  restartButton
 
 canvas = document.createElement('canvas')
 canvas.width = w = 240
@@ -35,21 +36,17 @@ div.appendChild(leftBtn)
 div.appendChild(fireBtn)
 div.appendChild(rightBtn)
 
-const startGame = (playerName) => {
-  // Display player name at the top of the game canvas
-  c.fillStyle = 'white'
-  c.font = '16px Arial'
-  c.fillText(`Player: ${playerName}`, 10, 20)
-
+const startGame = () => {
   addEvents()
-  init() 
+  init()
 }
+
 const playerModal = new Modal(startGame)
 playerModal.open()
 
 
 function init() {
-  lives = 0
+  lives = 4
   generation = 1
   dt = 0
   lastUpdate = Date.now()
@@ -89,12 +86,16 @@ function gameOver() {
   c.fillStyle = 'black'
   c.fillRect(0, 0, w, h)
   c.fillStyle = 'red'
-  c.font = '10px Arial'
-  // c.fillText('Generation: ' + generation, 5, 10)
-  // c.fillText('Invaders: ' + lives, 5, 20)
   let txt = 'Game Over!'
   c.font = '30px Arial'
   c.fillText(txt, (w - c.measureText(txt).width) / 2, h / 2)
+
+  // Draw 'Generation' text
+  c.fillStyle = 'red'
+  let generationText = 'Level: ' + generation
+  c.font = '15px Arial'
+  c.fillText(generationText, (w - c.measureText(generationText).width) / 2, h / 2 + 30)
+  createRestartButton()
 }
 
 function update() {
@@ -102,8 +103,18 @@ function update() {
   c.fillRect(0, 0, w, h)
   c.fillStyle = 'white'
   c.font = '10px Arial'
-  c.fillText('Generation: ' + generation, 5, 10)
-  c.fillText('Invaders: ' + lives, 5, 20)
+  c.fillText('Level: ' + generation, 5, 10)
+  const livesString = ' x '.repeat(lives)
+  c.fillText('Lives: ' + livesString, 5, 20)
+  // Draw the player name
+  c.fillStyle = 'white'
+  c.font = '10px Arial'
+  const storedPlayerName = localStorage.getItem('playerName')
+  if (storedPlayerName) {
+    const playerNameWidth = c.measureText(storedPlayerName).width
+    const xPos = w - playerNameWidth - 10  // 10 pixels away from the right edge
+    c.fillText(`${storedPlayerName}`, xPos, 10)
+  }
   for (let i = 0; i < invaders.population.length; i++) {
     invaders.population[i].show()
   }
@@ -124,12 +135,32 @@ function update() {
     }
     generation++
   }
-  if (lives > 4) {
+  if (lives <= 0) {
     gameOver()
     return
   }
   deltaTime()
   requestAnimationFrame(update)
+}
+
+function createRestartButton() {
+  restartButton = document.createElement('button')
+  restartButton.innerText = '↺'
+  restartButton.style.position = 'absolute'
+  restartButton.style.left = '50%'
+  restartButton.style.top = '60%'
+  restartButton.style.zIndex = 1000
+  restartButton.style.transform = 'translate(-50%, -50%)'
+
+  restartButton.addEventListener('click', () => {
+    // Remove the restart button
+    document.body.removeChild(restartButton)
+
+    // Reinitialize game settings
+    init()
+  })
+
+  document.body.appendChild(restartButton)
 }
 
 function addEvents() {

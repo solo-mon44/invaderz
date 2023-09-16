@@ -1,7 +1,13 @@
-self.addEventListener('fetch', function(e) {
+self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then(function(response) {
-      return response || fetch(e.request)
-    })
+    (async () => {
+      try {
+        const response = await caches.match(e.request)
+        return response || await fetch(e.request)
+      } catch (err) {
+        console.error('Fetch failed:', err)
+        throw err
+      }
+    })()
   )
 })

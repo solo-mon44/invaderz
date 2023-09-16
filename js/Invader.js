@@ -17,7 +17,7 @@ class Invader {
 
   update() {
     if (this.y >= h >> 2) {
-      lives++
+      lives--
       this.isAlive = false
       return
     }

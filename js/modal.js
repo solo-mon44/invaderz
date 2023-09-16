@@ -1,53 +1,59 @@
 class Modal {
   constructor(onSubmitCallback) {
+    if (typeof onSubmitCallback !== 'function') {
+      throw new Error('onSubmitCallback must be a function')
+    }
+
     this.modal = document.getElementById('playerModal')
     this.closeBtn = document.querySelector('.close')
     this.form = document.getElementById('playerForm')
-    this.playerName = ''
-    this.playerEmail = ''
+    this.playerNameInput = document.getElementById('playerName')
+    this.playerEmailInput = document.getElementById('playerEmail')
     this.onSubmitCallback = onSubmitCallback
     this.initEvents()
   }
+
   initEvents() {
-    // Close modal on 'x' click
     this.closeBtn.addEventListener('click', () => this.close())
-    // Limit character input for playerName
-    const playerNameInput = document.getElementById('playerName')
-    playerNameInput.addEventListener('input', (e) => {
+
+    this.playerNameInput.addEventListener('input', (e) => {
       if (e.target.value.length > 8) {
         e.target.value = e.target.value.slice(0, 8)
       }
     })
-    // Form submission event
-    this.form.addEventListener('submit', (e) => {
+
+    this.form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      this.playerName = document.getElementById('playerName').value.trim()
-      this.playerEmail = document.getElementById('playerEmail').value.trim()
-      // Basic validation
-      if (this.validatePlayerName(this.playerName) && this.validateEmail(this.playerEmail)) {
-        // Store information (You might want to use something more secure for a real application)
-        localStorage.setItem('playerName', this.playerName)
-        localStorage.setItem('playerEmail', this.playerEmail)
+      const playerName = this.playerNameInput.value.trim()
+      const playerEmail = this.playerEmailInput.value.trim()
+
+      const isNameValid = this.validatePlayerName(playerName)
+      const isEmailValid = await this.validateEmail(playerEmail)
+
+      if (isNameValid && isEmailValid) {
+        localStorage.setItem('playerName', playerName)
+        localStorage.setItem('playerEmail', playerEmail)
         this.close()
-        // Start the game
-        if (typeof this.onSubmitCallback === 'function') {
-          this.onSubmitCallback(this.playerName)
-        }
+        this.onSubmitCallback(playerName)
       } else {
-        alert('Invalid input. Please enter a valid name and email.')
+        // Display validation error message
       }
     })
   }
-  validateEmail(email) {
+
+  async validateEmail(email) {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    return re.test(email)
+    return re.test(email.trim())
   }
+
   validatePlayerName(name) {
     return name.length > 0 && name.length <= 8
   }
+
   open() {
     this.modal.style.display = 'block'
   }
+
   close() {
     this.modal.style.display = 'none'
   }
